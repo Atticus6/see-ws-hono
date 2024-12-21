@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <main>
+      <div id="now-time"></div>
+      <button onclick="getData()">开始</button>
+    </main>
+
+    <script>
+      const getData = () => {
+        const $nowTime = document.getElementById("now-time");
+        const eventSource = new EventSource("http://localhost:3000/sse");
+
+        // 处理默认的消息
+        eventSource.onmessage = (event) => {
+          console.log("Default Message:", event.data); // 打印消息内容
+          $nowTime.textContent = event.data; // 更新页面显示
+        };
+
+        // 处理自定义事件 "time-update"
+        eventSource.addEventListener("time-update", (event) => {
+          console.log("Custom Event:", event.data); // 打印自定义事件消息
+          $nowTime.innerHTML += event.data + "<br/>"; // 更新页面显示
+        });
+
+        // 错误处理
+        eventSource.onerror = (error) => {
+          console.error("SSE Error:", error);
+          eventSource.close();
+        };
+      };
+    </script>
+  </body>
+</html>
